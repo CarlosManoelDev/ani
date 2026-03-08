@@ -1,0 +1,755 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Feliz Aniversário</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <!--
+    ESTILOS GERAIS
+    - Layout moderno, centralizado e responsivo
+    - Carrossel horizontal com scroll-snap
+    - Cores suaves/românticas em tons de rosa/roxo
+  -->
+  <style>
+    :root {
+      /* Paleta mais escura, inspirada em céu noturno azul e prata */
+      --bg-gradient-start: #020617;
+      --bg-gradient-end: #0f172a;
+      --card-bg: rgba(15, 23, 42, 0.92);
+      --card-border: rgba(96, 165, 250, 0.08);
+      --accent: #60a5fa;
+      --accent-light: #93c5fd;
+      --accent-glow: rgba(96, 165, 250, 0.25);
+      --text-main: #ffffff;
+      --text-muted: #e2e8f0;
+      --shadow-soft: 0 24px 55px rgba(0, 0, 0, 0.75);
+      --radius-lg: 24px;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      font-family: "Plus Jakarta Sans", system-ui, sans-serif;
+      color: var(--text-main);
+      background: linear-gradient(160deg, var(--bg-gradient-start) 0%, var(--bg-gradient-end) 50%, #0c1222 100%);
+      overflow: hidden;
+    }
+
+    body {
+      display: flex;
+    }
+
+    /* 
+      CONTÊINER PRINCIPAL DO CARROSSEL
+      - Cada card ocupa 100% da largura da tela (100vw)
+      - scroll-snap para "travar" em cada card
+    */
+    .carousel {
+      display: flex;
+      height: 100vh;
+      width: 100vw;
+      overflow-x: auto;
+      overflow-y: hidden;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: thin;
+      scrollbar-color: rgba(148, 163, 184, 0.3) transparent;
+    }
+    .carousel::-webkit-scrollbar { height: 6px; }
+    .carousel::-webkit-scrollbar-track { background: transparent; }
+    .carousel::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.3); border-radius: 3px; }
+
+    /* 
+      CADA CARD
+      - Ocupa 100% da tela
+      - Centraliza o conteúdo no meio da viewport
+    */
+    .card {
+      flex: 0 0 100%;
+      height: 100vh;
+      scroll-snap-align: center;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 0; /* Card ocupa toda a tela, sem margem externa */
+    }
+
+    /* 
+      CAIXA INTERNA DO CARD
+      - Borda arredondada
+      - Sombra suave
+      - Fundo translúcido sobre o gradiente
+    */
+    .card-inner {
+      background: linear-gradient(180deg, rgba(20, 30, 48, 0.95) 0%, rgba(15, 23, 42, 0.98) 100%);
+      border-left: 1px solid var(--card-border);
+      border-right: 1px solid var(--card-border);
+      border-radius: 0;
+      box-shadow: inset 0 0 80px rgba(0, 0, 0, 0.2);
+      padding: 3rem 2rem 2.5rem;
+      max-width: none;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: flex-start; /* Garante que o conteúdo comece sempre do topo do card */
+      text-align: left; /* Textos principais alinhados à esquerda */
+      position: relative;
+      overflow-y: auto;   /* Se o texto for muito grande, permite rolar verticalmente dentro do card */
+      overflow-x: hidden;
+    }
+
+    .card-inner::before {
+      content: "";
+      position: absolute;
+      inset: -50%;
+      background:
+        radial-gradient(ellipse 80% 50% at 20% 20%, rgba(56, 189, 248, 0.1), transparent 50%),
+        radial-gradient(ellipse 60% 40% at 80% 80%, rgba(148, 163, 184, 0.08), transparent 50%),
+        radial-gradient(circle at 50% 50%, rgba(96, 165, 250, 0.03), transparent 70%);
+      pointer-events: none;
+    }
+
+    .card-content {
+      position: relative;
+      z-index: 1;
+      max-width: 720px;   /* Largura confortável de leitura */
+      margin: 0 auto;     /* Centraliza o bloco de texto no card */
+      text-align: left;   /* Parágrafos alinhados à esquerda */
+    }
+
+    .title-main {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: clamp(2.6rem, 5.5vw, 4rem);
+      font-weight: 600;
+      line-height: 1.15;
+      margin-bottom: 1rem;
+      text-align: center;
+      letter-spacing: 0.02em;
+    }
+
+    .title-highlight {
+      background: linear-gradient(135deg, #7dd3fc, #93c5fd, #e0e7ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      font-style: italic;
+      font-weight: 400;
+    }
+
+    .subtitle {
+      font-size: 1.05rem;
+      font-weight: 500;
+      line-height: 1.65;
+      margin: 0 0 0.65rem 0;
+      color: var(--text-muted);
+    }
+
+    .divider {
+      width: 60px;
+      height: 2px;
+      border-radius: 999px;
+      background: linear-gradient(90deg, transparent, var(--accent), transparent);
+      margin: 1.25rem auto 0;
+      opacity: 0.7;
+    }
+
+    .card-photo {
+      display: block;
+      max-width: 280px;
+      width: 100%;
+      height: auto;
+      border-radius: 16px;
+      margin: 1.5rem auto 0;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      object-fit: cover;
+    }
+
+    .hint {
+      position: absolute;
+      bottom: 1.2rem;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+      opacity: 0.9;
+      z-index: 1;
+    }
+
+    .hint-arrow {
+      font-size: 1rem;
+    }
+
+    /* 
+      ESTILOS DO CARD DO CONTADOR
+    */
+    .counter-title {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+      margin: 0 0 0.85rem 0;
+      text-align: center;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+      background: linear-gradient(135deg, #7dd3fc, #93c5fd, #e0e7ff);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .counter-subtitle {
+      margin-bottom: 1.25rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    .counter-grid {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      max-width: 500px;
+      margin: 2rem auto 0;
+      padding: 1.5rem 0;
+    }
+
+    .time-box {
+      background: #ffffff;
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 16px;
+      padding: 0.9rem 0.6rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .time-box:hover {
+      border-color: rgba(96, 165, 250, 0.4);
+      box-shadow: 0 4px 24px var(--accent-glow);
+    }
+
+    .time-value {
+      font-family: "Plus Jakarta Sans", sans-serif;
+      font-size: 1.6rem;
+      font-weight: 600;
+      color: #1e293b;
+    }
+
+    .time-label {
+      font-size: 0.75rem;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: #64748b;
+      margin-top: 0.2rem;
+    }
+
+    .date-fixed {
+      margin-top: 1.25rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    .date-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      background: rgba(30, 41, 59, 0.5);
+      border: 1px solid rgba(148, 163, 184, 0.2);
+      border-radius: 999px;
+      padding: 0.35rem 1rem;
+      margin-top: 0.5rem;
+      font-size: 0.85rem;
+      color: var(--text-main);
+    }
+
+    .date-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 999px;
+      background: var(--accent);
+      box-shadow: 0 0 8px var(--accent-glow);
+    }
+
+    #totalDays {
+      color: var(--accent-light);
+      font-weight: 600;
+      font-size: 1.1em;
+    }
+
+    /* 
+      CARD EXTRA / MODELO
+      - Você pode copiar/colar este padrão para criar novos cards
+    */
+    .note {
+      margin-top: 1rem;
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      max-width: 520px;
+    }
+
+    /* 
+      RESPONSIVIDADE
+    */
+    @media (max-width: 600px) {
+      .card-inner {
+        padding: 2rem 1.4rem 2.6rem;
+        border-radius: 0; /* Mantém o card em tela cheia também no celular */
+      }
+
+      .subtitle {
+        font-size: 0.96rem;
+      }
+
+      .counter-grid {
+        gap: 0.7rem;
+      }
+
+      .time-box {
+        padding: 0.7rem 0.4rem;
+      }
+
+      .time-value {
+        font-size: 1.25rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!--
+    CARROSSEL DE CARDS
+    Para adicionar ou remover cards:
+      - Copie/cole um bloco <section class="card"> ... </section>
+      - Edite apenas o conteúdo interno de .card-inner / .card-content
+  -->
+  <main class="carousel" id="carousel">
+
+    <!-- CARD 1 — Feliz Aniversário -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="card-content">
+          <h1 class="title-main">
+            Feliz Aniversário, <span class="title-highlight">anjo da minha vida</span>.
+          </h1>
+
+          <p class="subtitle">
+            Hoje você faz mais um ano de vida e, sinceramente, eu não sei o que dizer sem parecer clichê ou repetir coisas que todo mundo provavelmente já vai falar.
+            Então vou dizer apenas: Feliz Aniversário. Aproveite esse dia — o seu dia.
+          </p>
+
+          <p class="subtitle">
+            Não pense que você está ficando mais velha ou ficando sem tempo. Pense que você sobreviveu e superou mais um ano nessa vida.
+            Fique orgulhosa de si mesma. Você já passou por muitos altos e baixos e continua aqui, firme e forte.
+          </p>
+
+          <p class="subtitle">
+            Eu estou muito orgulhoso de você. Acredito de verdade que você vai conquistar tudo o que quer e tudo o que merece.
+          </p>
+
+          <p class="subtitle">
+            Te amo muito.
+          </p>
+
+          <img src="gatinho.jpg" alt="Gatinho" class="card-photo" />
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 2 — Nosso Primeiro Encontro -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="card-content">
+          <h2 class="counter-title">Nosso Primeiro Encontro</h2>
+
+          <p class="subtitle">
+            Quando eu te conheci, eu não estava em um momento muito bom da minha vida por várias razões.
+            Acho que isso explicava um pouco da raiva que eu carregava naquela época.
+          </p>
+
+          <p class="subtitle">
+            Nós nos conhecemos pelo Clash e jogamos juntos pela primeira vez.
+            Minhas primeiras impressões foram curiosas: eu achava que você provavelmente era um homem, sabia que você tinha um gato —
+            o que automaticamente me fazia gostar de você — e também percebi que você jogava muito bem.
+          </p>
+
+          <p class="subtitle">
+            Mesmo assim, fiquei com raiva depois daquela última partida. Mas, depois que aquela raiva boba do meu lado competitivo passou,
+            alguma coisa em mim quis te conhecer melhor.
+          </p>
+
+          <p class="subtitle">
+            Mesmo sem estar com cabeça para conhecer pessoas novas e querendo apenas me isolar no meu grupo de amigos,
+            você acabou sendo como um raio de luz entrando pela janela da minha vida naquele momento.
+          </p>
+
+          <p class="subtitle">
+            Depois disso eu fui atrás de você para pedir desculpas e tentar consertar a primeira impressão que eu tinha deixado.
+            E você também veio conversar comigo. Em pouco tempo eu já estava feliz por conhecer alguém novo de verdade.
+          </p>
+
+          <p class="subtitle">
+            Sinto saudade do nosso antigo servidor onde muitas dessas memórias aconteceram.
+            Mas você e eu lembramos delas, e para mim isso já é o suficiente.
+          </p>
+
+          <p class="subtitle">
+            Inclusive, apesar do seu apelido ser Moon, em um período daquela época eu achava que o nick do LoL “ySraSun”
+            parecia muito mais preciso para você: uma pessoa alegre e energética que ia de um lado para o outro sem parar.
+            Sinceramente gosto quando você é assim. Às vezes sinto que acabei apagando um pouco desse teu lado ao invés de contribuir. Então me desculpa.
+          </p>
+
+          <img src="lol.png" alt="League of Legends" class="card-photo" />
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 3 — O que eu amo em você (Parte 1) -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="card-content">
+          <h2 class="counter-title">O que eu amo em você</h2>
+
+          <p class="subtitle">
+            Sinceramente você é a única pessoa na minha vida inteira para quem eu poderia dedicar algo assim.
+            Eu sempre fui rodeado de pessoas, mas raramente senti que realmente gostava de algo específico nelas.
+            Mas com você é diferente.
+            Meu Deus, eu amo tantas coisas em você que fica difícil listar todas.
+          </p>
+
+          <p class="subtitle">
+            Uma das coisas que eu mais amo desde que nos conhecemos é a sua risada e o seu sorriso.
+            Toda vez que você ri de verdade, meu coração fica quentinho e eu me contagio com a sua felicidade.
+            Mesmo quando a gente não está bem um com o outro é difícil resistir.
+            Quando você faz aquela sua voz alegre também é como um tiro no peito.
+            Eu viveria com você para sempre só para ouvir essa voz e ver seu sorriso todos os dias.
+          </p>
+
+          <p class="subtitle">
+            Eu amo o seu jeito de jogar LoL completamente à moda caralha, escolhendo picks estranhos sem se importar com nada
+            e no final tudo dando certo (às vezes não, mas aí é melhor ainda).
+          </p>
+
+          <p class="subtitle">
+            Amo seu gosto musical e principalmente você cantando.
+            Eu normalmente não gosto quando pessoas cantam perto de mim, mas quando você canta porque está feliz é algo lindo de ouvir.
+            Na verdade eu amo sua voz no geral.
+            Se você quisesse me dar um presente que eu levaria para sempre, seria apenas um áudio seu falando algo para mim.
+            Sua voz ganhou um poder sobre mim que eu não sei explicar.
+          </p>
+ 
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 4 — O que eu amo em você (Parte 2) -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="card-content">
+          <h2 class="counter-title">O que eu amo em você</h2>
+
+          <p class="subtitle">
+            Continuando em um novo card porque existem muitas coisas.
+          </p>
+
+          <p class="subtitle">
+            Eu amo a sua atuação em RPG. Sinceramente esse é o maior motivo de eu ainda me interessar por RPG até hoje.
+            Se você parasse de jogar RPG acho que eu nunca mais jogaria também.
+          </p>
+
+          <p class="subtitle">
+            Amo como você tenta agradar as pessoas jogando ou assistindo coisas que normalmente você não escolheria.
+            Você é uma pessoa muito parceira e amiga de verdade.
+          </p>
+
+          <p class="subtitle">
+            Amo como você é gentil. Muitas coisas que parecem normais para mim te afetam de uma forma diferente,
+            porque você se preocupa em não machucar ninguém.
+          </p>
+
+          <p class="subtitle">
+            Também amo a sua aparência: seus olhos, o formato do seu rosto, o seu cabelo, seus piercings,
+            seu jeito de se vestir e suas curvas.
+          </p>
+          <p class="subtitle">
+            Amo suas construções no Minecraft
+          </p>
+          <p class="subtitle">
+            Amo suas construições no Minecraft
+          </p>
+          <p class="subtitle">
+            Amo o fato de ser impossivel tu arrotar
+          </p>
+          <p class="subtitle">
+            E Amo você gatinho nerd explicando as coisas independente do que seja
+          </p>
+
+          <img src="nerdmoon.jpg" alt="NerdMoon" class="card-photo" />
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 5 — Eu te amo -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="card-content">
+          <h2 class="counter-title">Eu Te Amo</h2>
+
+          <p class="subtitle">
+            Apesar de citar coisa que amo em vocês não pense que goste de você só por elas. Eu não te amo por uma coisa específica ou por atitudes específicas.
+            Eu simplesmente te amo do fundo do meu coração.
+            Você já disse que não entende como eu posso te amar mesmo sabendo dos seus erros, defeitos e problemas.
+            E sendo sincero, eu também não sei explicar logicamente.
+            Eu amo você completamente.
+            Até as partes de você que você mesma não gosta.
+            Eu escolhi te amar, e todos os dias que eu acordo eu escolho isso de novo.
+            Mesmo que você mude, mesmo que você não me queira, mesmo que tudo seja diferente.
+            Eu sempre vou te amar.
+          </p>
+
+          <img src="amovc.png" alt="Eu te amo" class="card-photo" />
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 6 — Momentos que nunca saíram da minha mente -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="card-content">
+          <h2 class="counter-title">Momentos que nunca saíram da minha mente</h2>
+
+          <p class="subtitle">
+            Existem muitos momentos desses quase quatro anos que nunca saíram da minha mente.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente a gente jogando One Block e virando aquelas raposas que apareciam só para acabar com nossas galinhas.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente as noites jogando Minecraft.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente sua reação quando eu te mostrei o vídeo que fiz para seu aniversário.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente quando você me mostrou seu canto seguro que era o RPG.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente quando você começou a jogar Valorant.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente as noites em claro conversando.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente quando construímos aquela casa torta no Minecraft porque não conseguíamos seguir o tutorial.
+          </p>
+
+          <p class="subtitle">
+            Nunca saiu da minha mente a felicidade quando você foi comprando as peças do seu PC.
+          </p>
+
+          <p class="subtitle">
+            Nunca vou esquecer os presentes que você me deu.
+          </p>
+
+          <p class="subtitle">
+            Nunca vou esquecer os momentos em que choramos juntos.
+          </p>
+          <p class="subtitle">
+            Nunca vou esquecer a gente jogando genshin e sofrendo pra pegar os bonecos que a gente queria.
+          </p>
+          <p class="subtitle">
+            E muitos outros momentos pequenos que para mim são extremamente especiais.
+          </p>
+        </div>
+      </div>
+    </section>
+
+    <!-- CARD 7 — Contador: Há quanto tempo estamos juntos? -->
+    <section class="card">
+      <div class="card-inner">
+        <div class="card-content">
+          <h2 class="counter-title">Há quanto tempo estamos juntos?</h2>
+
+          <p class="counter-subtitle">
+            Obrigado por fazer parte da minha vida.
+          </p>
+
+          <p class="subtitle">
+            Espero que esse contador nunca pare.
+          </p>
+
+          <p class="subtitle">
+            Lembre-se:
+          </p>
+
+          <p class="subtitle">
+            Eu te amo mais do que ontem e menos do que amanhã.
+          </p>
+
+          <p class="subtitle">
+            Eu te amo <span id="totalDays">0</span> vezes mais desde que nos conhecemos.  
+          </p>
+
+        
+          <!--
+            GRID DO CONTADOR
+            - Cada "time-box" mostra um valor (anos, meses, dias, etc.)
+            - Os spans com IDs são atualizados via JavaScript
+          -->
+          <div class="counter-grid">
+            <div class="time-box">
+              <span class="time-value" id="years">0</span>
+              <span class="time-label">anos</span>
+            </div>
+            <div class="time-box">
+              <span class="time-value" id="months">0</span>
+              <span class="time-label">meses</span>
+            </div>
+            <div class="time-box">
+              <span class="time-value" id="days">0</span>
+              <span class="time-label">dias</span>
+            </div>
+            <div class="time-box">
+              <span class="time-value" id="hours">0</span>
+              <span class="time-label">horas</span>
+            </div>
+            <div class="time-box">
+              <span class="time-value" id="minutes">0</span>
+              <span class="time-label">minutos</span>
+            </div>
+            <div class="time-box">
+              <span class="time-value" id="seconds">0</span>
+              <span class="time-label">segundos</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!--
+    SCRIPT DO CONTADOR
+    - Define uma data fixa de início do relacionamento / quando se conheceram
+    - Calcula a diferença exata em anos, meses, dias, horas, minutos e segundos
+    - Atualiza automaticamente a cada segundo
+  -->
+  <script>
+    // ALTERE ESTA DATA PARA A DATA EM QUE VOCÊS SE CONHECERAM
+    // Formato: ano, mês (0 = janeiro, 11 = dezembro), dia, hora, minuto, segundo
+    // 03/04/2022 às 18:00  ->  dia 3, mês 4 (abril), ano 2022
+    const startDate = new Date(2022, 3, 3, 18, 0, 0); // 03/04/2022 18:00
+
+    // Atualiza o texto visível da data inicial (apenas para exibir bonito na tela)
+    function updateStartDateLabel() {
+      const day = String(startDate.getDate()).padStart(2, "0");
+      const month = String(startDate.getMonth() + 1).padStart(2, "0");
+      const year = startDate.getFullYear();
+      const hours = String(startDate.getHours()).padStart(2, "0");
+      const minutes = String(startDate.getMinutes()).padStart(2, "0");
+
+      const label = `${day}/${month}/${year} ${hours}:${minutes}`;
+      const labelElement = document.getElementById("startDateLabel");
+      if (labelElement) {
+        labelElement.textContent = label;
+      }
+    }
+
+    // Função auxiliar: retorna quantos dias tem um determinado mês
+    function getDaysInMonth(year, monthIndex) {
+      // monthIndex: 0 = janeiro, 11 = dezembro
+      return new Date(year, monthIndex + 1, 0).getDate();
+    }
+
+    // Calcula e atualiza o contador na tela
+    function updateCounter() {
+      const now = new Date();
+      let years = now.getFullYear() - startDate.getFullYear();
+      let months = now.getMonth() - startDate.getMonth();
+      let days = now.getDate() - startDate.getDate();
+      let hours = now.getHours() - startDate.getHours();
+      let minutes = now.getMinutes() - startDate.getMinutes();
+      let seconds = now.getSeconds() - startDate.getSeconds();
+
+      // Normaliza segundos
+      if (seconds < 0) {
+        seconds += 60;
+        minutes -= 1;
+      }
+
+      // Normaliza minutos
+      if (minutes < 0) {
+        minutes += 60;
+        hours -= 1;
+      }
+
+      // Normaliza horas
+      if (hours < 0) {
+        hours += 24;
+        days -= 1;
+      }
+
+      // Normaliza dias (emprestando de um mês)
+      if (days < 0) {
+        const prevMonthIndex = (now.getMonth() - 1 + 12) % 12;
+        const prevMonthYear = prevMonthIndex === 11 ? now.getFullYear() - 1 : now.getFullYear();
+        const daysInPrevMonth = getDaysInMonth(prevMonthYear, prevMonthIndex);
+        days += daysInPrevMonth;
+        months -= 1;
+      }
+
+      // Normaliza meses
+      if (months < 0) {
+        months += 12;
+        years -= 1;
+      }
+
+      years = Math.max(0, years);
+      months = Math.max(0, months);
+      days = Math.max(0, days);
+      hours = Math.max(0, hours);
+      minutes = Math.max(0, minutes);
+      seconds = Math.max(0, seconds);
+
+      // Dias totais desde que se conheceram (para a frase "eu te amo mais vezes do que X dias")
+      const totalDays = Math.floor((now - startDate) / (1000 * 60 * 60 * 24));
+      const totalDaysEl = document.getElementById("totalDays");
+      if (totalDaysEl) totalDaysEl.textContent = Math.max(0, totalDays);
+
+      // Atualiza os elementos na página
+      const ids = { years, months, days, hours, minutes, seconds };
+      Object.entries(ids).forEach(([id, value]) => {
+        const el = document.getElementById(id);
+        if (el) el.textContent = String(value);
+      });
+    }
+
+    // Inicializa o contador e atualiza a cada segundo
+    updateStartDateLabel();
+    updateCounter();
+    setInterval(updateCounter, 1000);
+  </script>
+</body>
+</html>
